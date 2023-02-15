@@ -2116,7 +2116,7 @@ static const struct ethtool_ops rtw_ethtool_ops = {
 	.get_ethtool_stats = rtw_ethtool_get_stats,
 	.get_sset_count = rtw_ethtool_get_sset_count,
 };
-#endif // LINUX_VERSION_CODE >= 3.7.8 
+#endif // LINUX_VERSION_CODE >= 3.7.8
 #endif /* CONFIG_IOCTL_CFG80211 */
 /* For ethtool --- */
 
@@ -2128,7 +2128,11 @@ int rtw_os_ndev_register(_adapter *adapter, const char *name)
 	u8 rtnl_lock_needed = rtw_rtnl_lock_needed(dvobj);
 
 #ifdef CONFIG_RTW_NAPI
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+	netif_napi_add_weight(ndev, &adapter->napi, rtw_recv_napi_poll, RTL_NAPI_WEIGHT);
+#else
 	netif_napi_add(ndev, &adapter->napi, rtw_recv_napi_poll, RTL_NAPI_WEIGHT);
+#endif
 #endif /* CONFIG_RTW_NAPI */
 
 #if defined(CONFIG_IOCTL_CFG80211)
